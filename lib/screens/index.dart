@@ -1,127 +1,66 @@
+import 'package:app/components/button.dart';
+import 'package:app/screens/login.dart';
+import 'package:app/screens/register.dart';
 import 'package:flutter/material.dart';
+import '../helpers/database.dart';
 
 class Index extends StatelessWidget {
   const Index({super.key});
 
+  Future<bool> _checkSuperuser() async {
+    DatabaseHelper dbHelper = DatabaseHelper.instance;
+    bool exists = await dbHelper.existsUser();
+    return exists;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
+      body: FutureBuilder<bool>(
+        future: _checkSuperuser(),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else {
+            if (snapshot.data == true) {
+              return _template(() {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Login()));
+              }, 'Iniciar sesión');
+            } else {
+              return _template(() {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const Register()));
+              }, 'Registrarse');
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _template(VoidCallback handleClick, String text) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(color: Colors.white),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildBackground(),
-          _buildContent(),
+          const Spacer(),
+          const Image(image: AssetImage('assets/logo.png')),
+          const Text(
+            'Bienvenido',
+            style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          primaryButton(handleClick, text),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBackground() {
-    return Column(
-      children: [
-        const Image(
-          image: AssetImage('assets/background.jpeg'),
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
-        Expanded(
-          child: Container(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContent() {
-    return Column(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Container(),
-        ),
-        Expanded(
-          flex: 7,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-            ),
-            padding: const EdgeInsetsDirectional.only(top: 10),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Icon(
-                      Icons.account_circle_rounded,
-                      size: 150,
-                    ),
-                  ),
-                  _buildTextField(hintText: 'Usuario'),
-                  _buildTextField(hintText: 'Contraseña'),
-                  _buildPrimaryButton(),
-                  _buildSecondaryButton(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField({required String hintText}) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: hintText,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPrimaryButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: SizedBox(
-        width: double.infinity,
-        child: TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.black87,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-          ),
-          onPressed: () {},
-          child: const Text(
-            'Iniciar Sesión',
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecondaryButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30)),
-          ),
-        ),
-        onPressed: () {},
-        child: const Text(
-          'Cambiar contraseña',
-          style: TextStyle(color: Colors.black54, fontSize: 20),
-        ),
       ),
     );
   }
