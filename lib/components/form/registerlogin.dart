@@ -1,14 +1,15 @@
 import 'package:app/components/button.dart';
-import 'package:app/components/dialog.dart';
-import 'package:app/helpers/database.dart';
-import 'package:app/screens/menu.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
-
+class FormRegisterLogin extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final void Function(String, String) handleClick;
+  final String buttonText;
+
+  FormRegisterLogin(
+      {super.key, required this.handleClick, required this.buttonText});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class LoginScreen extends StatelessWidget {
       body: Stack(
         children: [
           _buildBackground(),
-          _buildContent(context),
+          _buildContent(),
         ],
       ),
     );
@@ -38,7 +39,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent() {
     return Column(
       children: [
         Expanded(
@@ -71,9 +72,9 @@ class LoginScreen extends StatelessWidget {
                   _buildTextField(
                       controller: _passwordController, hintText: 'Contraseña'),
                   primaryButton(() {
-                    _handleLogin(context);
-                  }, 'Iniciar Sesión'),
-                  secondaryButton(() {}, 'Cambiar contraseña'),
+                    handleClick(
+                        _usernameController.text, _passwordController.text);
+                  }, buttonText),
                 ],
               ),
             ),
@@ -95,19 +96,5 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _handleLogin(BuildContext context) async {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-    DatabaseHelper db = DatabaseHelper.instance;
-    bool checked = await db.checkUser(username, password);
-
-    if (context.mounted && checked) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const MenuScreen()));
-    } else if (context.mounted) {
-      showErrorDialog(context, 'Las credenciales son invalidas');
-    }
   }
 }

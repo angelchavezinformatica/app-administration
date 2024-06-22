@@ -4,12 +4,26 @@ import 'package:app/screens/register.dart';
 import 'package:flutter/material.dart';
 import '../helpers/database.dart';
 
-class Index extends StatelessWidget {
+class Index extends StatefulWidget {
   const Index({super.key});
+
+  @override
+  State<Index> createState() => _IndexState();
+}
+
+class _IndexState extends State<Index> {
+  bool registered = false;
+
+  void updateRegistered(bool value) {
+    setState(() {
+      registered = value;
+    });
+  }
 
   Future<bool> _checkSuperuser() async {
     DatabaseHelper dbHelper = DatabaseHelper.instance;
     bool exists = await dbHelper.existsUser();
+    registered = exists;
     return exists;
   }
 
@@ -30,13 +44,15 @@ class Index extends StatelessWidget {
           } else {
             if (snapshot.data == true) {
               return _template(() {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) => Login()));
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               }, 'Iniciar sesión');
             } else {
               return _template(() {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const Register()));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => RegisterScreen(
+                          updateRegistered: updateRegistered,
+                        )));
               }, 'Registrarse');
             }
           }

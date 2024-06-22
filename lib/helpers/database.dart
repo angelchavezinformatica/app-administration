@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'package:app/helpers/cryptography.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+String userTable = 'usuario';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -73,7 +76,30 @@ class DatabaseHelper {
 
   Future<bool> existsUser() async {
     Database db = await instance.database;
-    List<Map<String, dynamic>> users = await db.query('usuario');
+    List<Map<String, dynamic>> users = await db.query(userTable);
     return users.isNotEmpty;
+  }
+
+  Future<bool> insertUser(String username, String password) async {
+    if (await existsUser()) {
+      return false;
+    }
+    Database db = await instance.database;
+    await db.insert(userTable,
+        {'nombre_usuario': username, 'contrasena': hashPlainText(password)});
+    return true;
+  }
+
+  Future<bool> checkUser(String username, String password) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> users = await db.query(userTable);
+    if (users.isEmpty) {
+      return false;
+    }
+
+    Map<String, dynamic> user = users.first;
+
+    return user['nombre_usuario'] == username &&
+        compareHash(password, user['contrasena']);
   }
 }
