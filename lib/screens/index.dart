@@ -1,6 +1,6 @@
 import 'package:app/components/button.dart';
-import 'package:app/screens/login.dart';
-import 'package:app/screens/register.dart';
+import 'package:app/screens/auth/login.dart';
+import 'package:app/screens/auth/register.dart';
 import 'package:flutter/material.dart';
 import '../helpers/database.dart';
 
