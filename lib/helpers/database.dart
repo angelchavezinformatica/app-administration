@@ -4,6 +4,10 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 String userTable = 'usuario';
+String clientTable = 'cliente';
+String productTable = 'producto';
+String saleTable = 'venta';
+String saleDetailTable = 'detalle_venta';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -29,13 +33,13 @@ class DatabaseHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE usuario (
+      CREATE TABLE $userTable (
         id	INTEGER NOT NULL UNIQUE,
         nombre_usuario	VARCHAR(30) NOT NULL,
         contrasena	VARCHAR(50) NOT NULL,
         PRIMARY KEY(id AUTOINCREMENT)
       );
-      CREATE TABLE cliente(
+      CREATE TABLE $clientTable (
         id_cliente	INTEGER NOT NULL,
         nombres	VARCHAR(45) NOT NULL,
         apellidos	VARCHAR(45) NOT NULL,
@@ -43,16 +47,16 @@ class DatabaseHelper {
         email	VARCHAR(45),
         PRIMARY KEY(id_cliente AUTOINCREMENT)
       );
-      CREATE TABLE producto (
+      CREATE TABLE $productTable (
         id_producto	INTEGER NOT NULL,
         nombre	VARCHAR(45) NOT NULL,
         precio	FLOAT NOT NULL,
-        stock	NUMERIC NOT NULL,
+        stock	FLOAT NOT NULL,
         descripcion	TEXT,
         medida	VARCHAR(10) NOT NULL,
         PRIMARY KEY(id_producto AUTOINCREMENT)
       );
-      CREATE TABLE venta (
+      CREATE TABLE $saleTable (
         id_venta	INTEGER NOT NULL,
         fecha	DATE NOT NULL,
         monto_total	FLOAT NOT NULL,
@@ -60,7 +64,7 @@ class DatabaseHelper {
         FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente),
         PRIMARY KEY(id_venta AUTOINCREMENT)
       );
-      CREATE TABLE detalle_venta (
+      CREATE TABLE $saleDetailTable (
         id_detalle_venta	INTEGER NOT NULL,
         precio_producto_vendido	FLOAT NOT NULL,
         cantidad	NUMERIC NOT NULL,

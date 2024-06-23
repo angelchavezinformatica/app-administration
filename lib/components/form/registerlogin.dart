@@ -1,3 +1,4 @@
+import 'package:app/components/border.dart';
 import 'package:app/components/button.dart';
 import 'package:flutter/material.dart';
 
@@ -91,7 +92,8 @@ class FormRegisterLogin extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: const OutlineInputBorder(),
+          border: customInputBorder(),
+          focusedBorder: customInputBorder(),
           hintText: hintText,
         ),
       ),

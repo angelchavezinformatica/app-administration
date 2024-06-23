@@ -31,11 +31,9 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Expanded(
-        child: Container(
-          padding: const EdgeInsets.only(left: 16, top: 30, right: 16),
-          child: _widgetOptions.elementAt(_selectedIndex),
-        ),
+      body: Container(
+        padding: const EdgeInsets.only(left: 16, top: 30, right: 16),
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
