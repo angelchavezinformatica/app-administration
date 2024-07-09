@@ -54,27 +54,33 @@ class _InventoryScreenState extends State<InventoryScreen> {
     });
   }
 
-  void addProduct(Product product) {
-    setState(() {
-      allProducts.add(product);
-      products = allProducts;
-    });
+  void addProduct(Product product) async {
+    await DatabaseHelper.instance.addProduct(product);
+    updateProducts();
   }
 
-  void showAddProductDialog() {
+  void editProduct(Product product) async {
+    await DatabaseHelper.instance.updateProduct(product);
+    updateProducts();
+  }
+
+  void showAddProductDialog({Product? product}) {
+    final TextEditingController nameController =
+        TextEditingController(text: product?.name ?? '');
+    final TextEditingController priceController =
+        TextEditingController(text: product?.price.toString() ?? '');
+    final TextEditingController stockController =
+        TextEditingController(text: product?.stock.toString() ?? '');
+    final TextEditingController descriptionController =
+        TextEditingController(text: product?.description ?? '');
+    final TextEditingController measurementController =
+        TextEditingController(text: product?.measurement ?? '');
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController nameController = TextEditingController();
-        final TextEditingController priceController = TextEditingController();
-        final TextEditingController stockController = TextEditingController();
-        final TextEditingController descriptionController =
-            TextEditingController();
-        final TextEditingController measurementController =
-            TextEditingController();
-
         return AlertDialog(
-          title: const Text('Agregar Producto'),
+          title: Text(product == null ? 'Agregar Producto' : 'Editar Producto'),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -131,6 +137,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 if (name.isNotEmpty && measurement.isNotEmpty) {
                   final Product newProduct = Product(
+                    id: product?.id,
                     name: name,
                     price: price,
                     stock: stock,
@@ -138,16 +145,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     measurement: measurement,
                   );
 
-                  // Guardar el producto en la base de datos
-                  await DatabaseHelper.instance.addProduct(newProduct);
-                  // Actualizar la lista de productos
-                  updateProducts();
+                  if (product == null) {
+                    addProduct(newProduct);
+                  } else {
+                    editProduct(newProduct);
+                  }
 
-                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Agregar'),
+              child: Text(product == null ? 'Agregar' : 'Editar'),
             ),
           ],
         );
@@ -155,20 +162,27 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  void showEditProductDialog(Product product) {
+    showAddProductDialog(product: product);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         searchW(),
-        primaryButton(showAddProductDialog, 'Agregar Producto'),
+        primaryButton(() => showAddProductDialog(), 'Agregar Producto'),
         Expanded(
           child: ListView.builder(
             itemCount: products.length,
             itemBuilder: (BuildContext context, int index) {
-              return productW(products[index]);
+              return GestureDetector(
+                onTap: () => showEditProductDialog(products[index]),
+                child: productW(products[index]),
+              );
             },
           ),
-        )
+        ),
       ],
     );
   }

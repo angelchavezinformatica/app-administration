@@ -131,6 +131,7 @@ class DatabaseHelper {
     List<Product> parsedProducts = [];
     for (Map<String, dynamic> product in products) {
       parsedProducts.add(Product(
+          id: product['id_producto'],
           name: product['nombre'],
           price: product['precio'],
           stock: product['stock'],
@@ -138,5 +139,16 @@ class DatabaseHelper {
           measurement: product['medida']));
     }
     return parsedProducts;
+  }
+
+  Future<void> updateProduct(Product product) async {
+    Database db = await instance.database;
+    db.rawQuery('''
+      UPDATE $productTable
+      SET nombre = '${product.name}', precio = ${product.price},
+          stock = ${product.stock}, descripcion = '${product.description}',
+          medida = '${product.measurement}'
+      WHERE id_producto = ${product.id};
+    ''');
   }
 }
