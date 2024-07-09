@@ -1,7 +1,7 @@
 import 'package:app/components/border.dart';
 import 'package:app/components/button.dart';
 import 'package:app/constants/color.dart';
-// import 'package:app/helpers/database.dart';
+import 'package:app/helpers/database.dart';
 import 'package:app/types/product.dart';
 import 'package:flutter/material.dart';
 
@@ -15,12 +15,117 @@ class InventoryScreen extends StatefulWidget {
 class _InventoryScreenState extends State<InventoryScreen> {
   List<Product> products = [];
 
-  void updateProducts() {
-    // DatabaseHelper db = DatabaseHelper.instance;
-    // products = await db.getProducts();
-    // setState(() {
-    // products =
-    // });
+  @override
+  void initState() {
+    super.initState();
+    updateProducts();
+  }
+
+  void updateProducts() async {
+    DatabaseHelper db = DatabaseHelper.instance;
+    List<Product> newProducts = await db.getProducts();
+    setState(() {
+      products = newProducts;
+    });
+  }
+
+  void addProduct(Product product) {
+    setState(() {
+      products.add(product);
+    });
+  }
+
+  void showAddProductDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController nameController = TextEditingController();
+        final TextEditingController priceController = TextEditingController();
+        final TextEditingController stockController = TextEditingController();
+        final TextEditingController descriptionController =
+            TextEditingController();
+        final TextEditingController measurementController =
+            TextEditingController();
+
+        return AlertDialog(
+          title: const Text('Agregar Producto'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre',
+                  ),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Precio',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: stockController,
+                  decoration: const InputDecoration(
+                    labelText: 'Stock',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción',
+                  ),
+                ),
+                TextField(
+                  controller: measurementController,
+                  decoration: const InputDecoration(
+                    labelText: 'Medida',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final String name = nameController.text;
+                final double price =
+                    double.tryParse(priceController.text) ?? 0.0;
+                final double stock = double.tryParse(stockController.text) ?? 0;
+                final String description = descriptionController.text;
+                final String measurement = measurementController.text;
+
+                if (name.isNotEmpty && measurement.isNotEmpty) {
+                  final Product newProduct = Product(
+                    name: name,
+                    price: price,
+                    stock: stock,
+                    description: description,
+                    measurement: measurement,
+                  );
+
+                  // Guardar el producto en la base de datos
+                  await DatabaseHelper.instance.addProduct(newProduct);
+                  // Actualizar la lista de productos
+                  updateProducts();
+
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Agregar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -28,7 +133,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Column(
       children: [
         searchW(),
-        primaryButton(() {}, 'Agregar Producto'),
+        primaryButton(showAddProductDialog, 'Agregar Producto'),
         Expanded(
           child: ListView.builder(
             itemCount: products.length,
