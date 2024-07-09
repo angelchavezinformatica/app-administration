@@ -13,25 +13,51 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
+  List<Product> allProducts = [];
   List<Product> products = [];
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     updateProducts();
+    searchController.addListener(() {
+      filterProducts(searchController.text);
+    });
   }
 
   void updateProducts() async {
     DatabaseHelper db = DatabaseHelper.instance;
     List<Product> newProducts = await db.getProducts();
     setState(() {
+      allProducts = newProducts;
       products = newProducts;
+    });
+  }
+
+  void filterProducts(String name) {
+    if (name.isEmpty) {
+      setState(() {
+        products = allProducts;
+      });
+      return;
+    }
+
+    List<Product> results = allProducts
+        .where((product) =>
+            product.name.toLowerCase().contains(name.toLowerCase()))
+        .toList();
+
+    setState(() {
+      products = results;
     });
   }
 
   void addProduct(Product product) {
     setState(() {
-      products.add(product);
+      allProducts.add(product);
+      products = allProducts;
     });
   }
 
@@ -117,6 +143,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   // Actualizar la lista de productos
                   updateProducts();
 
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
               },
@@ -147,33 +174,32 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   Widget searchW() {
-    final TextEditingController search = TextEditingController();
     return Row(
       children: [
         Expanded(
           child: TextField(
-            controller: search,
+            controller: searchController,
+            focusNode: searchFocusNode,
             decoration: InputDecoration(
               border: customInputBorder(),
               focusedBorder: customInputBorder(),
               hintText: 'Buscar...',
+              prefixIcon: searchController.text.isEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        searchFocusNode.requestFocus();
+                      },
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        searchController.clear();
+                      },
+                    ),
             ),
           ),
         ),
-        const SizedBox(
-          width: 15,
-        ),
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 2),
-              borderRadius: BorderRadius.circular(100)),
-          child: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.search,
-                color: Colors.black,
-              )),
-        )
       ],
     );
   }
@@ -199,7 +225,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           ),
           const SizedBox(height: 8),
           textWithBold('Stock:', " ${product.stock} ${product.measurement}"),
-          textWithBold('Precio:', " S/.${product.price}"),
+          textWithBold('Precio:', " S/. ${product.price}"),
           textWithBold('Descripción:', " ${product.description}")
         ],
       ),
