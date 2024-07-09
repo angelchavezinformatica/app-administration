@@ -1,44 +1,27 @@
 import 'package:app/components/border.dart';
 import 'package:app/components/button.dart';
 import 'package:app/constants/color.dart';
+// import 'package:app/helpers/database.dart';
+import 'package:app/types/product.dart';
 import 'package:flutter/material.dart';
 
-class Product {
-  final int id;
-  final String name;
-  final double price;
-  final double stock;
-  final String description;
-  final String measurement;
-
-  const Product(
-      {required this.id,
-      required this.name,
-      required this.price,
-      required this.stock,
-      required this.description,
-      required this.measurement});
-}
-
-class InventoryScreen extends StatelessWidget {
+class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
 
-  final List<Product> products = const [
-    Product(
-        id: 1,
-        name: "Papaya",
-        price: 5.0,
-        stock: 25,
-        description: "Fruta tropical dulce y jugosa.",
-        measurement: "unidades"),
-    Product(
-        id: 2,
-        name: "Humus de lombriz",
-        price: 1.0,
-        stock: 128,
-        description: "Abono natural para plantas.",
-        measurement: "kg")
-  ];
+  @override
+  State<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends State<InventoryScreen> {
+  List<Product> products = [];
+
+  void updateProducts() {
+    // DatabaseHelper db = DatabaseHelper.instance;
+    // products = await db.getProducts();
+    // setState(() {
+    // products =
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {

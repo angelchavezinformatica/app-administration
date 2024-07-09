@@ -43,7 +43,7 @@ class _MenuScreenState extends State<MenuScreen> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.inventory),
-              label: 'Inventory',
+              label: 'Inventario',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.people),

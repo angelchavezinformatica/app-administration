@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:app/helpers/cryptography.dart';
+import 'package:app/types/product.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -80,7 +81,7 @@ class DatabaseHelper {
 
   Future<bool> existsUser() async {
     Database db = await instance.database;
-    List<Map<String, dynamic>> users = await db.query(userTable);
+    List<Map> users = await db.rawQuery('SELECT * FROM $userTable;');
     return users.isNotEmpty;
   }
 
@@ -89,14 +90,16 @@ class DatabaseHelper {
       return false;
     }
     Database db = await instance.database;
-    await db.insert(userTable,
-        {'nombre_usuario': username, 'contrasena': hashPlainText(password)});
+    String hashPassword = hashPlainText(password);
+    await db.execute(
+        '''INSERT INTO usuario (nombre_usuario, contrasena) VALUES ('$username', '$hashPassword');''');
     return true;
   }
 
   Future<bool> checkUser(String username, String password) async {
     Database db = await instance.database;
-    List<Map<String, dynamic>> users = await db.query(userTable);
+    List<Map<String, dynamic>> users =
+        await db.rawQuery('SELECT * FROM $userTable;');
     if (users.isEmpty) {
       return false;
     }
@@ -105,5 +108,28 @@ class DatabaseHelper {
 
     return user['nombre_usuario'] == username &&
         compareHash(password, user['contrasena']);
+  }
+
+  Future<void> addProduct(Product product) async {
+    Database db = await instance.database;
+    db.execute(
+        '''INSERT INTO producto (nombre, precio, stock, descripcion, medida)
+        VALUES ('${product.name}', ${product.price}, ${product.stock}, '${product.description}', '${product.measurement}');''');
+  }
+
+  Future<List<Product>> getProducts() async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> products =
+        await db.rawQuery('SELECT * FROM $productTable;');
+    List<Product> parsedProducts = [];
+    for (Map<String, dynamic> product in products) {
+      parsedProducts.add(Product(
+          name: product['nombre'],
+          price: product['precio'],
+          stock: product['stock'],
+          description: product['descripcion'],
+          measurement: product['medida']));
+    }
+    return parsedProducts;
   }
 }
