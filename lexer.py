@@ -27,10 +27,10 @@ tokens = (
     'QUESTION_MARK',
     'TYPE',
     'EQUALS',
-    'LBRACKET',  # Added for '['
-    'RBRACKET',  # Added for ']'
-    'AMPERSAND',  # Added for '&'
-    'UNIQUE_CHARS',  # Added for Unicode characters
+    'LBRACKET',
+    'RBRACKET',
+    'AMPERSAND',
+    'UNIQUE_CHARS',
 )
 
 # Reglas de expresiones regulares para tokens simples
