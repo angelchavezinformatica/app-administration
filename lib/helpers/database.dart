@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:app/helpers/cryptography.dart';
+import 'package:app/types/customer.dart';
 import 'package:app/types/product.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 String userTable = 'usuario';
-String clientTable = 'cliente';
+String customerTable = 'cliente';
 String productTable = 'producto';
 String saleTable = 'venta';
 String saleDetailTable = 'detalle_venta';
@@ -42,7 +43,7 @@ class DatabaseHelper {
     );''');
 
     await db.execute('''
-    CREATE TABLE $clientTable (
+    CREATE TABLE $customerTable (
       id_cliente	INTEGER NOT NULL,
       nombres	VARCHAR(45) NOT NULL,
       apellidos	VARCHAR(45) NOT NULL,
@@ -119,7 +120,7 @@ class DatabaseHelper {
 
   Future<void> addProduct(Product product) async {
     Database db = await instance.database;
-    db.execute(
+    await db.execute(
         '''INSERT INTO $productTable (nombre, precio, stock, descripcion, medida)
         VALUES ('${product.name}', ${product.price}, ${product.stock}, '${product.description}', '${product.measurement}');''');
   }
@@ -143,12 +144,47 @@ class DatabaseHelper {
 
   Future<void> updateProduct(Product product) async {
     Database db = await instance.database;
-    db.rawQuery('''
+    await db.rawQuery('''
       UPDATE $productTable
       SET nombre = '${product.name}', precio = ${product.price},
           stock = ${product.stock}, descripcion = '${product.description}',
           medida = '${product.measurement}'
       WHERE id_producto = ${product.id};
+    ''');
+  }
+
+  Future<List<Customer>> getCustomers() async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> customers =
+        await db.rawQuery('SELECT * FROM $customerTable');
+    List<Customer> parsedCustomers = [];
+
+    for (Map<String, dynamic> customer in customers) {
+      parsedCustomers.add(Customer(
+        id: customer['id_cliente'],
+        name: customer['nombres'],
+        lastname: customer['apellidos'],
+        phonenumber: customer['numero_telefono'],
+        email: customer['email'],
+      ));
+    }
+    return parsedCustomers;
+  }
+
+  Future<void> addCustomer(Customer customer) async {
+    Database db = await instance.database;
+    await db.execute(
+        '''INSERT INTO $customerTable (nombres, apellidos, numero_telefono, email)
+        VALUES ('${customer.name}', '${customer.lastname}', '${customer.phonenumber}', '${customer.email}');''');
+  }
+
+  Future<void> updateCustomer(Customer customer) async {
+    Database db = await instance.database;
+    await db.rawQuery('''
+      UPDATE $customerTable
+      SET nombres = '${customer.name}', apellidos = '${customer.lastname}',
+          numero_telefono = '${customer.phonenumber}', email = '${customer.email}'
+      WHERE id_cliente = ${customer.id};
     ''');
   }
 }

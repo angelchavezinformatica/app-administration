@@ -1,5 +1,5 @@
 import 'package:app/constants/color.dart';
-import 'package:app/screens/clients/index.dart';
+import 'package:app/screens/customer/index.dart';
 import 'package:app/screens/inventory/index.dart';
 import 'package:app/screens/sales/index.dart';
 import 'package:app/screens/settings/index.dart';
@@ -17,7 +17,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     InventoryScreen(),
-    ClientsScreen(),
+    CustomerScreen(),
     SalesScreen(),
     SettingsScreen(),
   ];

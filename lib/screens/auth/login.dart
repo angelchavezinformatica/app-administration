@@ -73,7 +73,6 @@ class LoginScreen extends StatelessWidget {
                   primaryButton(() {
                     _handleLogin(context);
                   }, 'Iniciar Sesión'),
-                  secondaryButton(() {}, 'Cambiar contraseña'),
                 ],
               ),
             ),
