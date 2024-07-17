@@ -30,7 +30,12 @@ tokens = (
     'LBRACKET',
     'RBRACKET',
     'AMPERSAND',
+    'DASH',
+    'BACKSLASH',
+    'EXCLAMATION',
+    'PIPE',
     'UNIQUE_CHARS',
+    'DOLLAR_SIGN',
 )
 
 # Reglas de expresiones regulares para tokens simples
@@ -84,6 +89,41 @@ def t_COMMENT(t):
 
 def t_UNIQUE_CHARS(t):
     r'[áéíóúÁÉÍÓÚñÑ]'
+    return t
+
+# Nueva regla para el símbolo de dólar en literales de cadena
+
+
+def t_DOLLAR_SIGN(t):
+    r'\$'
+    return t
+
+# Nueva regla para manejar el guion
+
+
+def t_DASH(t):
+    r'-'
+    return t
+
+# Nueva regla para manejar la barra invertida
+
+
+def t_BACKSLASH(t):
+    r'\\'
+    return t
+
+# Nueva regla para manejar el signo de exclamación
+
+
+def t_EXCLAMATION(t):
+    r'!'
+    return t
+
+# Nueva regla para manejar el símbolo de barra vertical
+
+
+def t_PIPE(t):
+    r'\|'
     return t
 
 
