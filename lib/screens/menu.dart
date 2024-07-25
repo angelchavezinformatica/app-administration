@@ -2,7 +2,7 @@ import 'package:app/constants/color.dart';
 import 'package:app/screens/customer/index.dart';
 import 'package:app/screens/inventory/index.dart';
 import 'package:app/screens/sales/index.dart';
-import 'package:app/screens/settings/index.dart';
+import 'package:app/screens/info/index.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -54,8 +54,8 @@ class _MenuScreenState extends State<MenuScreen> {
               label: 'Ventas',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Ajustes',
+              icon: Icon(Icons.info),
+              label: 'Información',
             ),
           ],
           currentIndex: _selectedIndex,
