@@ -1,5 +1,7 @@
 import 'package:app/components/button.dart';
+import 'package:app/components/nav.dart';
 import 'package:app/constants/color.dart';
+import 'package:app/screens/sales/add.dart';
 import 'package:app/types/sale.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +38,9 @@ class _SalesScreenState extends State<SalesScreen> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      primaryButton(() {}, 'Registrar Venta'),
+      primaryButton(() {
+        navTo(context, const SalesAddProduct());
+      }, 'Registrar Venta'),
       Expanded(
           child: ListView.builder(
               itemCount: sales.length,

@@ -12,4 +12,9 @@ class Customer {
     required this.email,
     required this.phonenumber,
   });
+
+  @override
+  String toString() {
+    return '$name $lastname ($phonenumber)';
+  }
 }
