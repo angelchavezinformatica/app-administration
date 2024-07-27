@@ -40,7 +40,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
           backgroundColor: greenColor,
         ),
         body: Container(
-          padding: const EdgeInsets.only(left: 16, top: 16, right: 16),
+          padding: const EdgeInsets.only(left: 8, top: 16, right: 8),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,9 +60,50 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                     setState(() {
                       dateSelected = value;
                     });
-                  })
+                  }),
+              const SizedBox(
+                height: 20,
+              ),
+              Expanded(child: tableW()),
             ],
           ),
         ));
+  }
+
+  Widget tableW() {
+    return Table(
+      border: TableBorder.all(),
+      columnWidths: const <int, TableColumnWidth>{
+        0: IntrinsicColumnWidth(),
+        1: FlexColumnWidth(),
+        2: IntrinsicColumnWidth(),
+        3: IntrinsicColumnWidth(),
+        4: IntrinsicColumnWidth(),
+      },
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: [headerTable()],
+    );
+  }
+
+  TableRow headerTable() {
+    TableCell headerCell(String text, double width, double height) {
+      return TableCell(
+          child: Container(
+        width: width,
+        height: height,
+        color: gray2Color,
+        child: Center(
+          child: Text(text),
+        ),
+      ));
+    }
+
+    return TableRow(children: [
+      headerCell('ID', 25, 25),
+      headerCell('Producto', double.infinity, 25),
+      headerCell('Precio', 50, 25),
+      headerCell('Cantidad', 65, 25),
+      headerCell('SubTotal', 65, 25),
+    ]);
   }
 }
