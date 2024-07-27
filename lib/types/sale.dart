@@ -1,6 +1,6 @@
 class Sale {
   final int? id;
-  final String date;
+  final DateTime date;
   final double total;
   final int customer;
   final String customerName;
@@ -20,7 +20,7 @@ class SaleDetail {
   final double price;
   final double cant;
   final double subtotal;
-  final int idSale;
+  final int? idSale;
   final int idProduct;
 
   const SaleDetail({

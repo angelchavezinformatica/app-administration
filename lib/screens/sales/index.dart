@@ -1,6 +1,7 @@
 import 'package:app/components/button.dart';
 import 'package:app/components/nav.dart';
 import 'package:app/constants/color.dart';
+import 'package:app/helpers/date.dart';
 import 'package:app/screens/sales/add.dart';
 import 'package:app/types/sale.dart';
 import 'package:flutter/material.dart';
@@ -14,16 +15,16 @@ class SalesScreen extends StatefulWidget {
 
 class _SalesScreenState extends State<SalesScreen> {
   List<Sale> sales = [
-    const Sale(
+    Sale(
         id: 1,
-        date: '26/07/2024',
+        date: DateTime.now(),
         total: 25,
         customer: 1,
         customerName: 'Félix Sánchez',
         details: []),
-    const Sale(
+    Sale(
         id: 1,
-        date: '26/07/2024',
+        date: DateTime.now(),
         total: 25,
         customer: 1,
         customerName: 'Dayanara Costa',
@@ -70,7 +71,7 @@ class _SalesScreenState extends State<SalesScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Fecha: ${sale.date}',
+                'Fecha: ${formatDateTime(sale.date)}',
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(width: 20),
