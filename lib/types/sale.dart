@@ -17,18 +17,20 @@ class Sale {
 
 class SaleDetail {
   final int? id;
+  final int? idSale;
+  final int idProduct;
+  final String productName;
   final double price;
   final double cant;
   final double subtotal;
-  final int? idSale;
-  final int idProduct;
 
   const SaleDetail({
     this.id,
+    this.idSale,
+    required this.idProduct,
+    required this.productName,
     required this.price,
     required this.cant,
     required this.subtotal,
-    required this.idSale,
-    required this.idProduct,
   });
 }

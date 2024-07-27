@@ -3,6 +3,7 @@ import 'package:app/components/dropdown.dart';
 import 'package:app/constants/color.dart';
 import 'package:app/helpers/database.dart';
 import 'package:app/types/customer.dart';
+import 'package:app/types/sale.dart';
 import 'package:flutter/material.dart';
 
 class SalesAddProduct extends StatefulWidget {
@@ -16,6 +17,20 @@ class _SalesAddProductState extends State<SalesAddProduct> {
   List<Customer> customers = [];
   Customer? customerSelected;
   DateTime? dateSelected;
+  List<SaleDetail> saleDetails = [
+    const SaleDetail(
+        idProduct: 1,
+        productName: 'Manzano Golden',
+        price: 20,
+        cant: 15,
+        subtotal: 20 * 15),
+    const SaleDetail(
+        idProduct: 1,
+        productName: 'Humus de lombriz',
+        price: 1,
+        cant: 15,
+        subtotal: 1 * 15),
+  ];
 
   @override
   void initState() {
@@ -71,6 +86,12 @@ class _SalesAddProductState extends State<SalesAddProduct> {
   }
 
   Widget tableW() {
+    List<TableRow> rows = [headerTable()];
+
+    for (var i = 0; i < saleDetails.length; i++) {
+      rows.add(rowTable(saleDetails[i], i + 1));
+    }
+
     return Table(
       border: TableBorder.all(),
       columnWidths: const <int, TableColumnWidth>{
@@ -81,7 +102,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
         4: IntrinsicColumnWidth(),
       },
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: [headerTable()],
+      children: rows,
     );
   }
 
@@ -104,6 +125,24 @@ class _SalesAddProductState extends State<SalesAddProduct> {
       headerCell('Precio', 50, 25),
       headerCell('Cantidad', 65, 25),
       headerCell('SubTotal', 65, 25),
+    ]);
+  }
+
+  TableRow rowTable(SaleDetail detail, int index) {
+    TableCell cell(String text) {
+      return TableCell(
+        child: Center(
+          child: Text(text),
+        ),
+      );
+    }
+
+    return TableRow(children: [
+      cell(index.toString()),
+      cell(detail.productName),
+      cell(detail.price.toString()),
+      cell(detail.cant.toString()),
+      cell(detail.subtotal.toString()),
     ]);
   }
 }
