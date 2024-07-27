@@ -1,3 +1,4 @@
+import 'package:app/components/datepicker.dart';
 import 'package:app/components/dropdown.dart';
 import 'package:app/constants/color.dart';
 import 'package:app/helpers/database.dart';
@@ -14,11 +15,13 @@ class SalesAddProduct extends StatefulWidget {
 class _SalesAddProductState extends State<SalesAddProduct> {
   List<Customer> customers = [];
   Customer? customerSelected;
+  DateTime? dateSelected;
 
   @override
   void initState() {
     super.initState();
     updateData();
+    dateSelected = DateTime.now();
   }
 
   void updateData() async {
@@ -38,16 +41,26 @@ class _SalesAddProductState extends State<SalesAddProduct> {
         ),
         body: Container(
           padding: const EdgeInsets.only(left: 16, top: 16, right: 16),
+          width: double.infinity,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CustomDropdown<Customer>(
                 data: customers,
                 hint: 'Cliente',
                 onChanged: (Customer? value) {
-                  customerSelected = value!;
-                  print(customerSelected);
+                  setState(() {
+                    customerSelected = value!;
+                  });
                 },
-              )
+              ),
+              DatePicker(
+                  selectedDate: dateSelected!,
+                  onChanged: (DateTime value) {
+                    setState(() {
+                      dateSelected = value;
+                    });
+                  })
             ],
           ),
         ));

@@ -66,7 +66,7 @@ class DatabaseHelper {
     await db.execute('''
     CREATE TABLE $saleTable (
       id_venta	INTEGER NOT NULL,
-      fecha	DATE NOT NULL,
+      fecha	DATETIME NOT NULL,
       monto_total	FLOAT NOT NULL,
       id_cliente	INTEGER NOT NULL,
       FOREIGN KEY(id_cliente) REFERENCES cliente(id_cliente),
