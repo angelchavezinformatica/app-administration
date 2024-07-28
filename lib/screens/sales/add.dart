@@ -1,3 +1,4 @@
+import 'package:app/components/button.dart';
 import 'package:app/components/datepicker.dart';
 import 'package:app/components/dropdown.dart';
 import 'package:app/constants/color.dart';
@@ -31,6 +32,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
         cant: 15,
         subtotal: 1 * 15),
   ];
+  double total = 20 * 15 + 1 * 15;
 
   @override
   void initState() {
@@ -47,6 +49,8 @@ class _SalesAddProductState extends State<SalesAddProduct> {
     });
   }
 
+  void saveSale() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,30 +61,49 @@ class _SalesAddProductState extends State<SalesAddProduct> {
         body: Container(
           padding: const EdgeInsets.only(left: 8, top: 16, right: 8),
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CustomDropdown<Customer>(
-                data: customers,
-                hint: 'Cliente',
-                onChanged: (Customer? value) {
-                  setState(() {
-                    customerSelected = value!;
-                  });
-                },
-              ),
-              DatePicker(
-                  selectedDate: dateSelected!,
-                  onChanged: (DateTime value) {
+          child: Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CustomDropdown<Customer>(
+                  data: customers,
+                  hint: 'Cliente',
+                  onChanged: (Customer? value) {
                     setState(() {
-                      dateSelected = value;
+                      customerSelected = value!;
                     });
-                  }),
-              const SizedBox(
-                height: 20,
-              ),
-              Expanded(child: tableW()),
-            ],
+                  },
+                ),
+                DatePicker(
+                    selectedDate: dateSelected!,
+                    onChanged: (DateTime value) {
+                      setState(() {
+                        dateSelected = value;
+                      });
+                    }),
+                const SizedBox(
+                  height: 20,
+                ),
+                tableW(),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      'Total: S/ $total',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: primaryButton(saveSale, 'Guardar Venta'),
+                )
+              ],
+            ),
           ),
         ));
   }
