@@ -98,10 +98,13 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: primaryButton(saveSale, 'Guardar Venta'),
-                )
+                if (customerSelected != null &&
+                    dateSelected != null &&
+                    saleDetails.isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    child: primaryButton(saveSale, 'Guardar Venta'),
+                  )
               ],
             ),
           ),
