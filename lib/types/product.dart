@@ -13,4 +13,9 @@ class Product {
       required this.stock,
       required this.description,
       required this.measurement});
+
+  @override
+  String toString() {
+    return name;
+  }
 }

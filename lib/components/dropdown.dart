@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomDropdown<T> extends StatefulWidget {
   final List<T> data;
   final String hint;
-  final Function(T? value) onChanged;
+  final Function(T value) onChanged;
   const CustomDropdown(
       {super.key,
       required this.data,
@@ -23,10 +23,12 @@ class CustomDropdownState<T> extends State<CustomDropdown<T>> {
       hint: Text(widget.hint),
       value: dropdownValue,
       onChanged: (T? value) {
-        setState(() {
-          dropdownValue = value;
-        });
-        widget.onChanged(value);
+        if (value != null) {
+          setState(() {
+            dropdownValue = value;
+          });
+          widget.onChanged(value);
+        }
       },
       items: widget.data.map<DropdownMenuItem<T>>((T value) {
         return DropdownMenuItem<T>(

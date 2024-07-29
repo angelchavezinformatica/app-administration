@@ -4,6 +4,7 @@ import 'package:app/components/dropdown.dart';
 import 'package:app/constants/color.dart';
 import 'package:app/helpers/database.dart';
 import 'package:app/types/customer.dart';
+import 'package:app/types/product.dart';
 import 'package:app/types/sale.dart';
 import 'package:flutter/material.dart';
 
@@ -17,22 +18,10 @@ class SalesAddProduct extends StatefulWidget {
 class _SalesAddProductState extends State<SalesAddProduct> {
   List<Customer> customers = [];
   Customer? customerSelected;
+  List<Product> products = [];
   DateTime? dateSelected;
-  List<SaleDetail> saleDetails = [
-    const SaleDetail(
-        idProduct: 1,
-        productName: 'Manzano Golden',
-        price: 20,
-        cant: 15,
-        subtotal: 20 * 15),
-    const SaleDetail(
-        idProduct: 1,
-        productName: 'Humus de lombriz',
-        price: 1,
-        cant: 15,
-        subtotal: 1 * 15),
-  ];
-  double total = 20 * 15 + 1 * 15;
+  List<SaleDetail> saleDetails = [];
+  double total = 0;
 
   @override
   void initState() {
@@ -44,9 +33,115 @@ class _SalesAddProductState extends State<SalesAddProduct> {
   void updateData() async {
     DatabaseHelper db = DatabaseHelper.instance;
     List<Customer> c = await db.getCustomers();
+    List<Product> p = await db.getProducts();
     setState(() {
       customers = c;
+      products = p;
     });
+  }
+
+  void addProduct() {
+    Product? product;
+    double subtotal = 0;
+    final TextEditingController price = TextEditingController();
+    final TextEditingController cant = TextEditingController();
+
+    bool priceError = false;
+    bool cantError = false;
+    String cantErrorMessage = 'No es un número valido';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Agregar Producto'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomDropdown<Product>(
+                    data: products,
+                    hint: 'Producto',
+                    onChanged: (Product value) {
+                      setState(() {
+                        product = value;
+                        price.text = value.price.toString();
+                        cant.text = '0';
+                      });
+                    },
+                  ),
+                  if (product != null)
+                    TextField(
+                      controller: price,
+                      onChanged: (String value) {
+                        try {
+                          subtotal = double.parse(price.text) *
+                              double.parse(cant.text);
+                          priceError = false;
+                        } catch (e) {
+                          priceError = true;
+                        }
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(labelText: 'Precio'),
+                    ),
+                  if (priceError)
+                    const Text(
+                      'No es un número valido',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  if (product != null)
+                    TextField(
+                      controller: cant,
+                      onChanged: (String value) {
+                        try {
+                          double c = double.parse(cant.text);
+                          subtotal = double.parse(price.text) * c;
+                          cantError = false;
+                          if (product!.stock < c) {
+                            cantErrorMessage = 'No hay productos suficientes';
+                            cantError = true;
+                          }
+                        } catch (e) {
+                          cantErrorMessage = 'No es un número valido';
+                          cantError = true;
+                        }
+                        setState(() {});
+                      },
+                      decoration: const InputDecoration(labelText: 'Cantidad'),
+                    ),
+                  if (cantError)
+                    Text(
+                      cantErrorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  if (product != null)
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  if (product != null) Text('SubTotal: $subtotal'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigator.of(context).pop();
+                  },
+                  child: const Text('Agregar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   void saveSale() {}
@@ -58,6 +153,18 @@ class _SalesAddProductState extends State<SalesAddProduct> {
           title: const Text('Registrar Venta'),
           backgroundColor: greenColor,
         ),
+        floatingActionButton: customerSelected != null
+            ? FloatingActionButton(
+                onPressed: addProduct,
+                backgroundColor: greenColor,
+                shape: const CircleBorder(),
+                child: const Icon(
+                  Icons.add,
+                  size: 50,
+                  color: Colors.white,
+                ),
+              )
+            : null,
         body: Container(
           padding: const EdgeInsets.only(left: 8, top: 16, right: 8),
           width: double.infinity,
@@ -68,9 +175,9 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                 CustomDropdown<Customer>(
                   data: customers,
                   hint: 'Cliente',
-                  onChanged: (Customer? value) {
+                  onChanged: (Customer value) {
                     setState(() {
-                      customerSelected = value!;
+                      customerSelected = value;
                     });
                   },
                 ),
