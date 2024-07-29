@@ -1,5 +1,6 @@
 import 'package:app/components/button.dart';
 import 'package:app/components/datepicker.dart';
+import 'package:app/components/dialog.dart';
 import 'package:app/components/dropdown.dart';
 import 'package:app/constants/color.dart';
 import 'package:app/helpers/database.dart';
@@ -54,7 +55,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
+          builder: (BuildContext context, StateSetter _setState) {
             return AlertDialog(
               title: const Text('Agregar Producto'),
               content: Column(
@@ -64,7 +65,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                     data: products,
                     hint: 'Producto',
                     onChanged: (Product value) {
-                      setState(() {
+                      _setState(() {
                         product = value;
                         price.text = value.price.toString();
                         cant.text = '0';
@@ -82,7 +83,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                         } catch (e) {
                           priceError = true;
                         }
-                        setState(() {});
+                        _setState(() {});
                       },
                       decoration: const InputDecoration(labelText: 'Precio'),
                     ),
@@ -107,7 +108,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                           cantErrorMessage = 'No es un número valido';
                           cantError = true;
                         }
-                        setState(() {});
+                        _setState(() {});
                       },
                       decoration: const InputDecoration(labelText: 'Cantidad'),
                     ),
@@ -132,7 +133,29 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Navigator.of(context).pop();
+                    double p = 0;
+                    double c = 0;
+                    try {
+                      p = double.parse(price.text);
+                      c = double.parse(cant.text);
+                    } catch (e) {
+                      showErrorDialog(context, 'Campos invalidos');
+                      return;
+                    }
+                    if (product!.stock < c) {
+                      showErrorDialog(context, 'Cantidad insuficiente');
+                    }
+
+                    setState(() {
+                      saleDetails.add(SaleDetail(
+                          idProduct: product!.id,
+                          productName: product!.name,
+                          price: p,
+                          cant: c,
+                          subtotal: p * c));
+                      total += p * c;
+                    });
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Agregar'),
                 ),

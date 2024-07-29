@@ -137,7 +137,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 if (name.isNotEmpty && measurement.isNotEmpty) {
                   final Product newProduct = Product(
-                    id: product?.id,
+                    id: product!.id,
                     name: name,
                     price: price,
                     stock: stock,
