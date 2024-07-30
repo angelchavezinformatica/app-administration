@@ -1,6 +1,7 @@
 import 'package:app/components/button.dart';
 import 'package:app/components/nav.dart';
 import 'package:app/constants/color.dart';
+import 'package:app/helpers/database.dart';
 import 'package:app/helpers/date.dart';
 import 'package:app/screens/sales/add.dart';
 import 'package:app/types/sale.dart';
@@ -14,33 +15,27 @@ class SalesScreen extends StatefulWidget {
 }
 
 class _SalesScreenState extends State<SalesScreen> {
-  List<Sale> sales = [
-    Sale(
-        id: 1,
-        date: DateTime.now(),
-        total: 25,
-        customer: 1,
-        customerName: 'Félix Sánchez',
-        details: []),
-    Sale(
-        id: 1,
-        date: DateTime.now(),
-        total: 25,
-        customer: 1,
-        customerName: 'Dayanara Costa',
-        details: [])
-  ];
+  List<Sale> sales = [];
 
   @override
   void initState() {
     super.initState();
+    updateData();
+  }
+
+  void updateData() async {
+    DatabaseHelper db = DatabaseHelper.instance;
+    List<Sale> s = await db.getSales();
+    setState(() {
+      sales = s;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       primaryButton(() {
-        navTo(context, const SalesAddProduct());
+        navTo(context, SalesAddProduct(updateData: updateData));
       }, 'Registrar Venta'),
       Expanded(
           child: ListView.builder(
@@ -62,7 +57,7 @@ class _SalesScreenState extends State<SalesScreen> {
           borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
-          Text(sale.customerName,
+          Text(sale.customerName!,
               style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,

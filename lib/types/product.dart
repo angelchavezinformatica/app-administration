@@ -1,13 +1,13 @@
 class Product {
-  final int id;
+  final int? id;
   final String name;
   final double price;
-  final double stock;
+  double stock;
   final String description;
   final String measurement;
 
-  const Product(
-      {required this.id,
+  Product(
+      {this.id,
       required this.name,
       required this.price,
       required this.stock,
@@ -17,5 +17,10 @@ class Product {
   @override
   String toString() {
     return name;
+  }
+
+  double updateStock(double value) {
+    stock += value;
+    return stock;
   }
 }

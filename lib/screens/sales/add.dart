@@ -10,7 +10,8 @@ import 'package:app/types/sale.dart';
 import 'package:flutter/material.dart';
 
 class SalesAddProduct extends StatefulWidget {
-  const SalesAddProduct({super.key});
+  final Function updateData;
+  const SalesAddProduct({super.key, required this.updateData});
 
   @override
   State<SalesAddProduct> createState() => _SalesAddProductState();
@@ -55,6 +56,7 @@ class _SalesAddProductState extends State<SalesAddProduct> {
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
+          // ignore: no_leading_underscores_for_local_identifiers
           builder: (BuildContext context, StateSetter _setState) {
             return AlertDialog(
               title: const Text('Agregar Producto'),
@@ -142,13 +144,27 @@ class _SalesAddProductState extends State<SalesAddProduct> {
                       showErrorDialog(context, 'Campos invalidos');
                       return;
                     }
-                    if (product!.stock < c) {
-                      showErrorDialog(context, 'Cantidad insuficiente');
+                    if (c <= 0) {
+                      showErrorDialog(context,
+                          'No puede registrar una cantidad negativa o cero');
+                      return;
                     }
+                    if (p <= 0) {
+                      showErrorDialog(context,
+                          'No puede registrar un precio negativo o cero');
+                      return;
+                    }
+                    if (product!.stock < c) {
+                      showErrorDialog(
+                          context, 'Cantidad insuficiente: ${product!.stock}');
+                      return;
+                    }
+
+                    product!.updateStock(-c);
 
                     setState(() {
                       saleDetails.add(SaleDetail(
-                          idProduct: product!.id,
+                          idProduct: product?.id ?? -1,
                           productName: product!.name,
                           price: p,
                           cant: c,
@@ -167,7 +183,19 @@ class _SalesAddProductState extends State<SalesAddProduct> {
     );
   }
 
-  void saveSale() {}
+  Future<void> saveSale() async {
+    Sale sale = Sale(
+        date: dateSelected!,
+        total: total,
+        customer: customerSelected!.id!,
+        details: saleDetails);
+
+    DatabaseHelper db = DatabaseHelper.instance;
+    await db.addSale(sale);
+    await widget.updateData();
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -3,15 +3,15 @@ class Sale {
   final DateTime date;
   final double total;
   final int customer;
-  final String customerName;
+  final String? customerName;
   final List<SaleDetail> details;
 
   const Sale(
       {this.id,
+      this.customerName,
       required this.date,
       required this.total,
       required this.customer,
-      required this.customerName,
       required this.details});
 }
 

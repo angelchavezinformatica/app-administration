@@ -137,7 +137,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 if (name.isNotEmpty && measurement.isNotEmpty) {
                   final Product newProduct = Product(
-                    id: product!.id,
+                    id: product?.id ?? -1,
                     name: name,
                     price: price,
                     stock: stock,
@@ -145,6 +145,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     measurement: measurement,
                   );
 
+                  // ignore: unnecessary_null_comparison
                   if (product == null) {
                     addProduct(newProduct);
                   } else {

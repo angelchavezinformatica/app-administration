@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:app/helpers/cryptography.dart';
 import 'package:app/types/customer.dart';
 import 'package:app/types/product.dart';
+import 'package:app/types/sale.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -77,7 +78,7 @@ class DatabaseHelper {
     CREATE TABLE $saleDetailTable (
       id_detalle_venta	INTEGER NOT NULL,
       precio_producto_vendido	FLOAT NOT NULL,
-      cantidad	NUMERIC NOT NULL,
+      cantidad	FLOAT NOT NULL,
       subtotal	FLOAT NOT NULL,
       id_venta	INTEGER NOT NULL,
       id_producto	INTEGER NOT NULL,
@@ -178,6 +179,49 @@ class DatabaseHelper {
         VALUES ('${customer.name}', '${customer.lastname}', '${customer.phonenumber}', '${customer.email}');''');
   }
 
+  Future<List<Sale>> getSales() async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> sales = await db.rawQuery('''
+      SELECT s.id_venta, s.fecha, s.monto_total, s.id_cliente, c.nombres, c.apellidos
+      FROM $saleTable s
+      JOIN $customerTable c ON s.id_cliente = c.id_cliente;
+    ''');
+    List<Sale> parsedSales = [];
+
+    for (Map<String, dynamic> sale in sales) {
+      int idVenta = sale['id_venta'];
+
+      List<Map<String, dynamic>> details = await db.rawQuery('''
+        SELECT sd.id_detalle_venta, sd.precio_producto_vendido, sd.cantidad, sd.subtotal, sd.id_venta, sd.id_producto, p.nombre
+        FROM $saleDetailTable sd
+        JOIN $productTable p ON sd.id_producto = p.id_producto
+        WHERE sd.id_venta = $idVenta;
+      ''');
+      List<SaleDetail> saleDetails = [];
+
+      for (Map<String, dynamic> detail in details) {
+        saleDetails.add(SaleDetail(
+            id: detail['id_detalle_venta'],
+            idSale: detail['id_venta'],
+            idProduct: detail['id_producto'],
+            productName: detail['nombre'],
+            price: detail['precio_producto_vendido'],
+            cant: detail['cantidad'],
+            subtotal: detail['subtotal']));
+      }
+
+      parsedSales.add(Sale(
+          id: sale['id_venta'],
+          date: DateTime.parse(sale['fecha']),
+          total: sale['monto_total'],
+          customer: sale['id_cliente'],
+          customerName: '${sale['nombres']} ${sale['apellidos']}',
+          details: saleDetails));
+    }
+
+    return parsedSales;
+  }
+
   Future<void> updateCustomer(Customer customer) async {
     Database db = await instance.database;
     await db.rawQuery('''
@@ -186,5 +230,28 @@ class DatabaseHelper {
           numero_telefono = '${customer.phonenumber}', email = '${customer.email}'
       WHERE id_cliente = ${customer.id};
     ''');
+  }
+
+  Future<void> addSale(Sale sale) async {
+    Database db = await instance.database;
+    int lastId = await db
+        .rawInsert('''INSERT INTO $saleTable (fecha, monto_total, id_cliente)
+      VALUES ('${sale.date}', ${sale.total}, ${sale.customer});''');
+
+    String sqlInsert =
+        '''INSERT INTO $saleDetailTable (precio_producto_vendido, cantidad, subtotal, id_venta, id_producto) VALUES ''';
+
+    for (var i = 0; i < sale.details.length; i++) {
+      if (i != 0) sqlInsert += ', ';
+
+      SaleDetail detail = sale.details[i];
+      sqlInsert +=
+          '''(${detail.price}, ${detail.cant}, ${detail.subtotal}, $lastId, ${detail.idProduct})''';
+      await db.rawUpdate(
+          '''UPDATE $productTable SET stock=stock - ${detail.cant} WHERE id_producto=${detail.idProduct};''');
+    }
+    sqlInsert += ';';
+
+    await db.rawInsert(sqlInsert);
   }
 }
