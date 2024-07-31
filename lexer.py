@@ -186,9 +186,17 @@ def main(file: str):
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1:
+
+    from pathlib import Path
+
+    if len(sys.argv) <= 1:
+        print("Por favor, proporciona el nombre del archivo como argumento.")
+    elif sys.argv[1] in ('-a', '--all'):
+        files = [str(archivo) for archivo in Path(
+            'lib').rglob('*') if archivo.is_file()]
+        for file in files:
+            main(file)
+    else:
         tokens = main(sys.argv[1])
         for token in tokens:
             print(token)
-    else:
-        print("Por favor, proporciona el nombre del archivo como argumento.")
