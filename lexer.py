@@ -36,6 +36,13 @@ tokens = (
     'PIPE',
     'UNIQUE_CHARS',
     'DOLLAR_SIGN',
+    'PLUS',
+    'ASTERISK',
+    'MINUS',
+    'DIVIDE',
+    'LT',  # Less than
+    'GT',  # Greater than
+    'MOD',  # Modulo
 )
 
 # Reglas de expresiones regulares para tokens simples
@@ -65,6 +72,13 @@ t_EQUALS = r'='
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
 t_AMPERSAND = r'&&'
+t_PLUS = r'\+'
+t_ASTERISK = r'\*'
+t_MINUS = r'-'
+t_DIVIDE = r'/'
+t_LT = r'<'
+t_GT = r'>'
+t_MOD = r'%'
 
 # Regla para tipos de datos (int, String, double, etc.)
 t_TYPE = r'\b(?:int|String|double|bool|Color)\b'
