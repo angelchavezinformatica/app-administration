@@ -36,7 +36,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget about() {
     return const ExpansionTile(
-      title: Text('Ayuda y Soporte'),
+      title: Text('Acerca de'),
       children: <Widget>[
         ListTile(
           title: Text('Descripción'),
